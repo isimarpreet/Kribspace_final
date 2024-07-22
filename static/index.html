@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Estate Query Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin: 15px 0 5px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .results table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .results table, .results th, .results td {
+            border: 1px solid #ddd;
+        }
+        .results th, .results td {
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Real Estate Query Interface</h1>
+        <label for="query">Enter your query:</label>
+        <input type="text" id="query" placeholder="e.g., Find houses in New York with 3 bedrooms under $500,000">
+        <button onclick="submitQuery()">Submit</button>
+        <div class="results" id="results"></div>
+    </div>
+
+    <script>
+        function submitQuery() {
+            const query = document.getElementById('query').value;
+            fetch('/query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ query })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('results').innerHTML = `<p>Error: ${data.error}</p>`;
+                } else {
+                    displayResults(data);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('results').innerHTML = '<p>An error occurred while fetching the results.</p>';
+            });
+        }
+
+        function displayResults(data) {
+            const resultsDiv = document.getElementById('results');
+            if (data.length === 0) {
+                resultsDiv.innerHTML = '<p>No results found.</p>';
+                return;
+            }
+            let table = '<table><tr><th>ID</th><th>Location</th><th>Budget</th><th>Size (sqft)</th><th>Year Built</th><th>Type</th><th>Condition</th><th>Amenities</th></tr>';
+            data.forEach(row => {
+                table += `<tr>
+                    <td>${row.id}</td>
+                    <td>${row.location}</td>
+                    <td>${row.budget}</td>
+                    <td>${row.size}</td>
+                    <td>${row.year_built}</td>
+                    <td>${row.type}</td>
+                    <td>${row.condition}</td>
+                    <td>${row.amenities}</td>
+                </tr>`;
+            });
+            table += '</table>';
+            resultsDiv.innerHTML = table;
+        }
+    </script>
+</body>
+</html>
