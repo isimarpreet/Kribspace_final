@@ -1,4 +1,4 @@
-                                                                          KribSpace
+                                                                   KribSpace
                                                    AI-Powered Query Interface for Real Estate
 
 
